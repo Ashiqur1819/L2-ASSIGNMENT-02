@@ -1,0 +1,10 @@
+# Dependencies
+node_modules
+
+# Coverage and build directories
+dist
+
+# Environment variables
+.env
+.env.local
+
