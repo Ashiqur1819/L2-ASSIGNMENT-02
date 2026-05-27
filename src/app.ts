@@ -13,4 +13,11 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Server is running successfully...")
 })
 
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
 export default app;
