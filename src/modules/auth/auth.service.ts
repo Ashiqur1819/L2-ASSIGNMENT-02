@@ -1,6 +1,7 @@
 import { pool } from "../../db";
 import bcrypt from "bcrypt";
 import { IAuth } from "./auth.interface";
+import jwt from "jsonwebtoken";
 
 
 // Service function to create a new user in the database
@@ -26,6 +27,36 @@ const createUserIntoDB = async (payload: IAuth) => {
   return result.rows[0];
 };
 
+// Service function to authenticate a user and generate a JWT token
+const loginUserIntoDB = async (email: string, password: string) => {
+    const result = await pool.query(
+        "SELECT * FROM users WHERE email = $1",
+        [email]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+        return null;
+    }
+
+    delete user.password;
+
+    const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1d" }
+    );
+
+    return { token, user };
+};
+
 export const authService = {
   createUserIntoDB,
+  loginUserIntoDB
 };
