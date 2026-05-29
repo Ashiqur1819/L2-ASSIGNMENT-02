@@ -16,8 +16,6 @@ const createIssue = async (req: Request, res: Response) => {
       message: "Failed to create issue",
     });
   }
-
-  return result;
 };
 
 const getAllIssues = async (req: Request, res: Response) => {
@@ -42,11 +40,44 @@ const getAllIssues = async (req: Request, res: Response) => {
       message: "Something went wrong",
     });
   }
+};
 
-  return result;
+const getIssueById = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+
+  const result = await issueService.getIssueById(parseInt(id));
+
+  if (result) {
+    res.status(200).json({
+      success: true,
+      message: "Issue retrieved successfully",
+      data: {
+        id: result.id,
+        title: result.title,
+        description: result.description,
+        type: result.type,
+        status: result.status,
+
+        reporter: {
+          id: result.reporter_id,
+          name: result.reporter_name,
+          role: result.reporter_role,
+        },
+
+        created_at: result.created_at,
+        updated_at: result.updated_at,
+      },
+    });
+  } else {
+    res.status(404).json({
+      success: false,
+      message: "Issue not found",
+    });
+  }
 };
 
 export const issueController = {
   createIssue,
   getAllIssues,
+  getIssueById,
 };
