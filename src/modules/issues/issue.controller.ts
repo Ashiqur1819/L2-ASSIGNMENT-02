@@ -76,8 +76,111 @@ const getIssueById = async (req: Request<{ id: string }>, res: Response) => {
   }
 };
 
+const updateIssue = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid issue id",
+      });
+    }
+
+    const issue = await issueService.updateIssueByID(id, req.body);
+
+    if (!issue) {
+      return res.status(404).json({
+        success: false,
+        message: "Issue not found",
+      });
+    }
+
+    const user = req.user!;
+
+    if (user.role !== "maintainer") {
+      if (issue.reporter_id !== user.id) {
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden",
+        });
+      }
+
+      if (issue.status !== "open") {
+        return res.status(403).json({
+          success: false,
+          message: "You can only update open issues",
+        });
+      }
+    }
+
+    const updatedIssue = await issueService.updateIssueByID(id, req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Issue updated successfully",
+      data: updatedIssue,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const deleteIssue = async (req: Request<{ id: string }>, res: Response) => {
+ const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid issue id",
+      });
+    }
+
+    const user = req.user;
+
+    if (user.role !== "maintainer") {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
+      });
+    }
+
+    const issue = await issueService.getIssueById(id);
+
+    if (!issue) {
+      return res.status(404).json({
+        success: false,
+        message: "Issue not found",
+      });
+    }
+
+  const result = await issueService.deleteIssueByID(id);
+
+  if (result) {
+    res.status(200).json({
+      success: true,
+      message: "Issue deleted successfully",
+    });
+  } else {
+    res.status(404).json({
+      success: false,
+      message: "Issue not found",
+    });
+  }
+};
+
 export const issueController = {
   createIssue,
   getAllIssues,
   getIssueById,
+  updateIssue,
+  deleteIssue,
 };

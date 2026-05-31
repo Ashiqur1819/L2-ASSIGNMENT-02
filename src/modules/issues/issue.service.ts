@@ -108,8 +108,50 @@ const getIssueById = async (id: number) => {
     return result.rows[0];
 }
 
+const updateIssueByID = async (
+  id: number,
+  payload: {
+    title?: string;
+    description?: string;
+    type?: string;
+  }
+) => {
+  const { title, description, type } = payload;
+
+  const result = await pool.query(
+    `
+    UPDATE issues
+    SET
+      title = COALESCE($1, title),
+      description = COALESCE($2, description),
+      type = COALESCE($3, type),
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = $4
+    RETURNING *
+    `,
+    [title, description, type, id]
+  );
+
+  return result.rows[0];
+};
+
+const deleteIssueByID = async (id: number) => {
+  const result = await pool.query(
+    `
+    DELETE FROM issues
+    WHERE id = $1
+    RETURNING *
+    `,
+    [id]
+  );
+
+  return result.rows[0];
+};
+
 export const issueService = {
     createIssueIntoDB,
     getAllIssues,
-    getIssueById
+    getIssueById,
+    updateIssueByID,
+    deleteIssueByID,
 }
