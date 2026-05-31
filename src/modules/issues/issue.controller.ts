@@ -90,7 +90,7 @@ const updateIssue = async (
       });
     }
 
-    const issue = await issueService.updateIssueByID(id, req.body);
+    const issue = await issueService.getIssueById(id);
 
     if (!issue) {
       return res.status(404).json({
@@ -145,6 +145,7 @@ const deleteIssue = async (req: Request<{ id: string }>, res: Response) => {
     }
 
     const user = req.user;
+    
 
     if (user.role !== "maintainer") {
       return res.status(403).json({

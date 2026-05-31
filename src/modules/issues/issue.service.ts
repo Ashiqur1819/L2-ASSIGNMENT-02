@@ -116,7 +116,7 @@ const updateIssueByID = async (
     type?: string;
   }
 ) => {
-  const { title, description, type } = payload;
+  const { title, description, type } = payload || {};
 
   const result = await pool.query(
     `
