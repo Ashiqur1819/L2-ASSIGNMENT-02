@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { authService } from "./auth.service";
+import { authService } from "./auth.service.js";
 
 // Controller function to handle user signup
 const signupUser = async (req: Request, res: Response) => {

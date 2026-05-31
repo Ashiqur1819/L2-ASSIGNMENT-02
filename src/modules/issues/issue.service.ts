@@ -1,5 +1,5 @@
 import { pool } from "../../db"
-import { IIssue } from "./issue.interface";
+import { IIssue } from "./issue.interface.js";
 
 const createIssueIntoDB = async (issueData: IIssue, reporter_id: number) => {
     const {title, description, type, status} = issueData;

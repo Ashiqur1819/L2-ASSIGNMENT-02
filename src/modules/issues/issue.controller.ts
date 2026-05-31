@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { issueService } from "./issue.service";
+import { issueService } from "./issue.service.js";
 
 const createIssue = async (req: Request, res: Response) => {
   const result = await issueService.createIssueIntoDB(req.body, req.user?.id);
